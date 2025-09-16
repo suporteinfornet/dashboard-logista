@@ -1,0 +1,2182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Logista - Leque de Modas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-card h1 {
+            color: #662483;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #662483;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #662483, #4A1A5C);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #662483;
+            font-size: 2em;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #662483;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-weight: 600;
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .tab.active {
+            background: #662483;
+            color: white;
+        }
+
+        .tab:hover {
+            background: #662483;
+            color: white;
+        }
+
+        /* Content Area */
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            min-height: 400px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #662483;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .modal-header h2 {
+            color: #662483;
+            margin: 0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #662483;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group small {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-aprovado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejeitado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-varejo {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-atacado {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-ambos {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .upload-area:hover {
+            border-color: #662483;
+        }
+
+        .upload-area.dragover {
+            border-color: #662483;
+            background: #f8f9ff;
+        }
+
+        .upload-preview {
+            margin-top: 10px;
+        }
+
+        .upload-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-title {
+            color: #662483;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Loading states */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+                padding: 20px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div id="loginContainer" class="login-container">
+            <div class="login-card">
+            <h1>🏪 Dashboard Logista</h1>
+            <p>Gerencie suas lojas, produtos e pedidos</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" required>
+                </div>
+                    <button type="submit" class="btn" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                    <!-- Botões de teste removidos - dashboard pronto para produção -->
+            </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="dashboard">
+            <!-- Header -->
+            <div class="header">
+                <h1>🏪 Dashboard Logista</h1>
+                <div class="user-info">
+                    <span>Usuário: <span id="userName">Carregando...</span></span>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalPedidos">0</h3>
+                    <p>Total de Pedidos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="pedidosPendentes">0</h3>
+                    <p>Pedidos Pendentes</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="pedidosConfirmados">0</h3>
+                    <p>Pedidos Confirmados</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalVendas">R$ 0,00</h3>
+                    <p>Total em Vendas</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-tabs">
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('pedidos')">
+                        <i class="fas fa-shopping-cart"></i> Pedidos
+                    </div>
+                    <div class="tab" onclick="showTab('lojas')">
+                        <i class="fas fa-store"></i> Minhas Lojas
+                    </div>
+                    <div class="tab" onclick="showTab('produtos')">
+                        <i class="fas fa-box"></i> Produtos
+                    </div>
+                    <div class="tab" onclick="showTab('perfil')">
+                        <i class="fas fa-user"></i> Perfil
+                    </div>
+                </div>
+                </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Pedidos Tab -->
+                <div id="pedidos" class="tab-content active">
+                    <h2><i class="fas fa-shopping-cart"></i> Gerenciar Pedidos</h2>
+                    <div id="pedidosList">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Carregando pedidos...
+                        </div>
+                </div>
+                </div>
+
+                <!-- Lojas Tab -->
+                <div id="lojas" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-store"></i> Minhas Lojas</h2>
+                            <button class="btn btn-info" onclick="showAddLojaModal()">
+                                <i class="fas fa-plus"></i> Adicionar Loja
+                            </button>
+                        </div>
+                    <div id="lojasList">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                Carregando lojas...
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+                <!-- Produtos Tab -->
+                <div id="produtos" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i class="fas fa-box"></i> Meus Produtos</h2>
+                            <button class="btn btn-info" onclick="showAddProdutoModal()">
+                                <i class="fas fa-plus"></i> Adicionar Produto
+                            </button>
+                        </div>
+                    <div id="produtosList">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                Carregando produtos...
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+                <!-- Perfil Tab -->
+                <div id="perfil" class="tab-content">
+                    <h2><i class="fas fa-user"></i> Meu Perfil</h2>
+                    <div id="perfilContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Carregando perfil...
+                            </div>
+                            </div>
+                        </div>
+            </div>
+        </div>
+            </div>
+
+    <!-- Modal Adicionar Loja -->
+    <div id="addLojaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-store"></i> Adicionar Loja</h2>
+            <span class="close" onclick="closeModal('addLojaModal')">&times;</span>
+            </div>
+            <form id="addLojaForm">
+                <div class="form-group">
+                    <label for="lojaNome">Nome da Loja *</label>
+                    <input type="text" id="lojaNome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lojaDescricao">Descrição</label>
+                    <textarea id="lojaDescricao" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lojaTelefone">Telefone</label>
+                        <input type="text" id="lojaTelefone">
+                    </div>
+                    <div class="form-group">
+                        <label for="lojaEmail">Email</label>
+                        <input type="email" id="lojaEmail">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lojaEndereco">Endereço</label>
+                    <input type="text" id="lojaEndereco">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lojaBairro">Bairro *</label>
+                        <input type="text" id="lojaBairro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lojaCidade">Cidade *</label>
+                        <input type="text" id="lojaCidade" required>
+                    </div>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="lojaEstado">Estado *</label>
+                        <input type="text" id="lojaEstado" maxlength="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lojaCep">CEP</label>
+                        <input type="text" id="lojaCep">
+                    </div>
+                    <div class="form-group">
+                        <label for="lojaRegiao">Região *</label>
+                        <select id="lojaRegiao" required>
+                            <option value="">Selecione a região</option>
+                            <option value="Norte">Norte</option>
+                            <option value="Nordeste">Nordeste</option>
+                            <option value="Centro-Oeste">Centro-Oeste</option>
+                            <option value="Sudeste">Sudeste</option>
+                            <option value="Sul">Sul</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lojaPolo">Cidade/Estado *</label>
+                    <input type="text" id="lojaPolo" placeholder="Ex: Fortaleza/CE" required>
+                    <small>Cidade e estado onde a loja está localizada</small>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="lojaInstagram">Instagram</label>
+                        <input type="text" id="lojaInstagram">
+                    </div>
+                    <div class="form-group">
+                        <label for="lojaWhatsapp">WhatsApp</label>
+                        <input type="text" id="lojaWhatsapp">
+                    </div>
+                </div>
+                
+                    <div class="form-group">
+                    <label for="lojaTipoVenda">Tipo de Venda *</label>
+                    <select id="lojaTipoVenda" required>
+                        <option value="">Selecione o tipo de venda</option>
+                        <option value="varejo">Apenas Varejo</option>
+                        <option value="atacado">Apenas Atacado</option>
+                        <option value="ambos">Varejo e Atacado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="lojaSegmento">Segmento *</label>
+                    <input type="number" id="lojaSegmento" placeholder="Ex: 1 (Moda Feminina), 2 (Masculina), etc." required>
+                    <small>ID do segmento da loja</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="lojaQuantidadeMinimaAtacado">Quantidade Mínima para Atacado *</label>
+                    <input type="number" id="lojaQuantidadeMinimaAtacado" min="1" value="1" required>
+                    <small>Quantidade mínima de peças para venda no atacado (será aplicada a todos os produtos desta loja)</small>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addLojaModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar Loja</button>
+                </div>
+            </form>
+                </div>
+            </div>
+
+    <!-- Modal Adicionar Produto -->
+    <div id="addProdutoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-box"></i> Adicionar Produto</h2>
+            <span class="close" onclick="closeModal('addProdutoModal')">&times;</span>
+            </div>
+            <form id="addProdutoForm">
+                <div class="form-group">
+                    <label for="produtoLoja">Loja *</label>
+                    <select id="produtoLoja" required onchange="updateTipoVendaProduto()">
+                        <option value="">Selecione uma loja</option>
+                    </select>
+            </div>
+                
+                <div class="form-group">
+                    <label for="produtoNome">Nome do Produto *</label>
+                    <input type="text" id="produtoNome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="produtoDescricao">Descrição</label>
+                    <textarea id="produtoDescricao" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoCategoria">Categoria</label>
+                        <input type="text" id="produtoCategoria">
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoMarca">Marca</label>
+                        <input type="text" id="produtoMarca">
+                    </div>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="produtoCor">Cor</label>
+                        <input type="text" id="produtoCor">
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoMaterial">Material</label>
+                        <input type="text" id="produtoMaterial">
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoTipoVenda">Tipo de Venda</label>
+                        <select id="produtoTipoVenda" disabled>
+                            <option value="">Selecione uma loja primeiro</option>
+                        </select>
+                        <small>Baseado no tipo de venda da loja selecionada</small>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoPrecoVarejo">Preço Varejo (R$)</label>
+                        <input type="number" id="produtoPrecoVarejo" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoPrecoAtacado">Preço Atacado (R$)</label>
+                        <input type="number" id="produtoPrecoAtacado" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoTamanhos">Tamanhos Disponíveis</label>
+                        <input type="text" id="produtoTamanhos" placeholder="Ex: P,M,G,GG (separados por vírgula)">
+                        <small>Digite os tamanhos separados por vírgula</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoQuantidadeMinima">Quantidade Mínima Atacado</label>
+                        <input type="number" id="produtoQuantidadeMinima" min="1" value="1" readonly>
+                        <small>Quantidade mínima definida na loja selecionada (será preenchida automaticamente)</small>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="produtoImagem">Imagem do Produto</label>
+                    <div class="upload-area" onclick="document.getElementById('produtoImagemFile').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2em; color: #666; margin-bottom: 10px;"></i>
+                        <p>Clique para selecionar uma imagem ou arraste aqui</p>
+                        <input type="file" id="produtoImagemFile" accept="image/*" style="display: none;" onchange="handleImageUpload('produtoImagemFile', 'produtoImagem')">
+                    </div>
+                    <input type="hidden" id="produtoImagem">
+                    <div id="produtoImagemPreview" class="upload-preview"></div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProdutoModal')">Cancelar</button>
+                    <button type="submit" class="btn">Salvar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Editar Loja -->
+    <div id="editLojaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Editar Loja</h2>
+                <span class="close" onclick="closeModal('editLojaModal')">&times;</span>
+            </div>
+            <form id="editLojaForm">
+                <input type="hidden" id="editLojaId">
+                <!-- Mesmos campos do modal de adicionar loja -->
+                <div class="form-group">
+                    <label for="editLojaNome">Nome da Loja *</label>
+                    <input type="text" id="editLojaNome" required>
+                        </div>
+                
+                <div class="form-group">
+                    <label for="editLojaDescricao">Descrição</label>
+                    <textarea id="editLojaDescricao" rows="3"></textarea>
+                        </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editLojaTelefone">Telefone</label>
+                        <input type="text" id="editLojaTelefone">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLojaEmail">Email</label>
+                        <input type="email" id="editLojaEmail">
+                </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLojaEndereco">Endereço</label>
+                    <input type="text" id="editLojaEndereco">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editLojaBairro">Bairro *</label>
+                        <input type="text" id="editLojaBairro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLojaCidade">Cidade *</label>
+                        <input type="text" id="editLojaCidade" required>
+                    </div>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="editLojaEstado">Estado *</label>
+                        <input type="text" id="editLojaEstado" maxlength="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLojaCep">CEP</label>
+                        <input type="text" id="editLojaCep">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLojaRegiao">Região *</label>
+                        <select id="editLojaRegiao" required>
+                            <option value="">Selecione a região</option>
+                            <option value="Norte">Norte</option>
+                            <option value="Nordeste">Nordeste</option>
+                            <option value="Centro-Oeste">Centro-Oeste</option>
+                            <option value="Sudeste">Sudeste</option>
+                            <option value="Sul">Sul</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLojaPolo">Cidade/Estado *</label>
+                    <input type="text" id="editLojaPolo" placeholder="Ex: Fortaleza/CE" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editLojaInstagram">Instagram</label>
+                        <input type="text" id="editLojaInstagram">
+                    </div>
+                    <div class="form-group">
+                        <label for="editLojaWhatsapp">WhatsApp</label>
+                        <input type="text" id="editLojaWhatsapp">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLojaTipoVenda">Tipo de Venda *</label>
+                    <select id="editLojaTipoVenda" required>
+                        <option value="">Selecione o tipo de venda</option>
+                        <option value="varejo">Apenas Varejo</option>
+                        <option value="atacado">Apenas Atacado</option>
+                        <option value="ambos">Varejo e Atacado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLojaSegmento">Segmento *</label>
+                    <input type="number" id="editLojaSegmento" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editLojaQuantidadeMinimaAtacado">Quantidade Mínima para Atacado *</label>
+                    <input type="number" id="editLojaQuantidadeMinimaAtacado" min="1" required>
+                    <small>Quantidade mínima de peças para venda no atacado</small>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editLojaModal')">Cancelar</button>
+                    <button type="submit" class="btn">Atualizar Loja</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configurações da API (igual ao admin panel)
+        const BASE_URL = 'https://lequedemodas.com.br:8443/leque-de-modas-api';
+        
+        // Variáveis globais
+        let currentUser = null;
+        let authToken = null;
+        let userLojas = [];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingSession();
+            setupEventListeners();
+            checkFileProtocol();
+        });
+
+        // Verificar se está sendo aberto via file://
+        function checkFileProtocol() {
+            if (window.location.protocol === 'file:') {
+                console.warn('⚠️ Arquivo aberto via file:// - Usando modo de compatibilidade');
+                console.log('💡 Para melhor experiência:');
+                console.log('1. Use um servidor web local: python -m http.server 8080');
+                console.log('2. Ou hospede o arquivo em um servidor web');
+                console.log('3. O dashboard funcionará mesmo com CORS, mas pode ser mais lento');
+                
+                // Mostrar aviso visual
+                const warningDiv = document.createElement('div');
+                warningDiv.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    left: 10px;
+                    right: 10px;
+                    background: #d1ecf1;
+                    border: 1px solid #bee5eb;
+                    padding: 15px;
+                    border-radius: 8px;
+                    z-index: 9999;
+                    font-family: Arial, sans-serif;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                `;
+                warningDiv.innerHTML = `
+                    <strong>ℹ️ Modo de Compatibilidade:</strong> Arquivo aberto localmente. O dashboard funcionará, mas para melhor performance use um servidor web.<br>
+                    <strong>💡 Dica:</strong> Execute <code>python -m http.server 8080</code> na pasta do arquivo e acesse via http://localhost:8080<br>
+                    <button onclick="this.parentElement.remove()" style="float: right; background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✕</button>
+                `;
+                document.body.appendChild(warningDiv);
+                
+                // Remover aviso após 20 segundos
+                setTimeout(() => {
+                    if (warningDiv.parentElement) {
+                        warningDiv.remove();
+                    }
+                }, 20000);
+            }
+        }
+
+        // Função removida - não precisa de verificação CORS em produção
+
+        // Verificar sessão existente
+        function checkExistingSession() {
+            const savedToken = localStorage.getItem('token');
+            const savedUser = localStorage.getItem('user');
+            
+            if (savedToken && savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    authToken = savedToken;
+                    
+                    if (currentUser.id || currentUser.usuario_id) {
+                        if (!currentUser.id && currentUser.usuario_id) {
+                            currentUser.id = currentUser.usuario_id;
+                        }
+                        
+                        showDashboard();
+                        loadDashboard();
+                    } else {
+                        logout();
+                    }
+                } catch (error) {
+                    console.error('Erro ao restaurar sessão:', error);
+                    logout();
+                }
+            }
+        }
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Formulário adicionar loja
+            document.getElementById('addLojaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = {
+                    nome: document.getElementById('lojaNome').value,
+                    descricao: document.getElementById('lojaDescricao').value,
+                    telefone: document.getElementById('lojaTelefone').value,
+                    email: document.getElementById('lojaEmail').value,
+                    endereco: document.getElementById('lojaEndereco').value,
+                    bairro: document.getElementById('lojaBairro').value,
+                    cidade: document.getElementById('lojaCidade').value,
+                    estado: document.getElementById('lojaEstado').value,
+                    cep: document.getElementById('lojaCep').value,
+                    regiao: document.getElementById('lojaRegiao').value,
+                    polo: document.getElementById('lojaPolo').value,
+                    instagram: document.getElementById('lojaInstagram').value,
+                    whatsapp: document.getElementById('lojaWhatsapp').value,
+                    tipo_venda: document.getElementById('lojaTipoVenda').value,
+                    segmento_id: parseInt(document.getElementById('lojaSegmento').value),
+                    quantidade_minima_atacado: parseInt(document.getElementById('lojaQuantidadeMinimaAtacado').value)
+                };
+                addLoja(formData);
+            });
+            
+            // Formulário editar loja
+            document.getElementById('editLojaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const lojaId = document.getElementById('editLojaId').value;
+                const formData = {
+                    nome: document.getElementById('editLojaNome').value,
+                    descricao: document.getElementById('editLojaDescricao').value,
+                    telefone: document.getElementById('editLojaTelefone').value,
+                    email: document.getElementById('editLojaEmail').value,
+                    endereco: document.getElementById('editLojaEndereco').value,
+                    bairro: document.getElementById('editLojaBairro').value,
+                    cidade: document.getElementById('editLojaCidade').value,
+                    estado: document.getElementById('editLojaEstado').value,
+                    cep: document.getElementById('editLojaCep').value,
+                    regiao: document.getElementById('editLojaRegiao').value,
+                    polo: document.getElementById('editLojaPolo').value,
+                    instagram: document.getElementById('editLojaInstagram').value,
+                    whatsapp: document.getElementById('editLojaWhatsapp').value,
+                    tipo_venda: document.getElementById('editLojaTipoVenda').value,
+                    segmento_id: parseInt(document.getElementById('editLojaSegmento').value),
+                    quantidade_minima_atacado: parseInt(document.getElementById('editLojaQuantidadeMinimaAtacado').value)
+                };
+                updateLoja(lojaId, formData);
+            });
+            
+            // Formulário adicionar produto
+            document.getElementById('addProdutoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = {
+                    nome_produto: document.getElementById('produtoNome').value,
+                    descricao_produto: document.getElementById('produtoDescricao').value,
+                    categoria: document.getElementById('produtoCategoria').value,
+                    marca: document.getElementById('produtoMarca').value,
+                    cor: document.getElementById('produtoCor').value,
+                    material: document.getElementById('produtoMaterial').value,
+                    tipo_venda: document.getElementById('produtoTipoVenda').value,
+                    preco_varejo: parseFloat(document.getElementById('produtoPrecoVarejo').value) || 0,
+                    preco_atacado: parseFloat(document.getElementById('produtoPrecoAtacado').value) || 0,
+                    tamanhos_disponiveis: document.getElementById('produtoTamanhos').value,
+                    quantidade_minima_atacado: parseInt(document.getElementById('produtoQuantidadeMinima').value) || 1,
+                    imagem_produto: document.getElementById('produtoImagem').value,
+                    loja_id: parseInt(document.getElementById('produtoLoja').value)
+                };
+                addProduto(formData);
+            });
+        }
+
+        // Mostrar dashboard
+        function showDashboard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').classList.add('show');
+            
+                    const userName = currentUser.nome || currentUser.nome_usuario || currentUser.email || 'Usuário';
+                    document.getElementById('userName').textContent = userName;
+        }
+
+        // Mostrar login
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('show');
+        }
+
+        // Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+            
+            try {
+                const response = await fetch(`${BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        senha: senha,
+                        tipo: 'logista'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Verificar se é logista
+                    const user = typeof data.user === 'string' ? JSON.parse(data.user) : data.user;
+                    
+                    if (user.tipo !== 'logista') {
+                        showError('Apenas logistas podem acessar este dashboard.');
+                        return;
+                    }
+                    
+                    currentUser = user;
+                    authToken = data.token;
+                    
+                    if (!currentUser.id && currentUser.usuario_id) {
+                        currentUser.id = currentUser.usuario_id;
+                    }
+                    
+                    // Salvar sessão
+                    localStorage.setItem('token', authToken);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    
+                    showDashboard();
+                    loadDashboard();
+                } else {
+                    showError(data.message || 'Erro no login');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        }
+
+        // Carregar dashboard
+        async function loadDashboard() {
+            try {
+                console.log('🚀 Iniciando carregamento do dashboard...');
+                console.log('👤 Usuário logado:', currentUser);
+                console.log('🔑 Token disponível:', authToken ? 'Sim' : 'Não');
+                
+                await Promise.all([
+                    loadStats(),
+                    loadPedidos(),
+                    loadLojas(),
+                    loadProdutos(),
+                    loadPerfil()
+                ]);
+                
+                console.log('✅ Dashboard carregado com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dashboard:', error);
+                console.error('🔍 Detalhes do erro:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
+                
+                showError('Erro ao carregar dados do dashboard: ' + error.message);
+            }
+        }
+
+        // Função removida - debug detalhado implementado
+
+        // Função removida - não precisa de dados simulados em produção
+
+        // Carregar estatísticas
+        async function loadStats() {
+            try {
+                console.log('📊 [STATS] Iniciando carregamento de estatísticas...');
+                console.log('📊 [STATS] Usuário ID:', currentUser.id);
+                console.log('📊 [STATS] URL:', `${BASE_URL}/dashboard/dashboard`);
+                console.log('📊 [STATS] Token:', authToken ? 'Presente' : 'Ausente');
+                
+                const response = await fetch(`${BASE_URL}/dashboard/dashboard`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                console.log('📊 [STATS] Status da resposta:', response.status);
+                console.log('📊 [STATS] Headers da resposta:', response.headers);
+                console.log('📊 [STATS] URL da resposta:', response.url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 [STATS] Dados recebidos:', data);
+                    
+                    document.getElementById('totalPedidos').textContent = data.total_pedidos || 0;
+                    document.getElementById('pedidosPendentes').textContent = data.pedidos_pendentes || 0;
+                    document.getElementById('pedidosConfirmados').textContent = data.pedidos_confirmados || 0;
+                    document.getElementById('totalVendas').textContent = `R$ ${(data.total_vendas || 0).toFixed(2).replace('.', ',')}`;
+                    
+                    console.log('📊 [STATS] Estatísticas atualizadas na interface');
+                } else {
+                    console.error('📊 [STATS] Erro na API:', response.status, response.statusText);
+                    const errorText = await response.text();
+                    console.error('📊 [STATS] Resposta de erro:', errorText);
+                    
+                    document.getElementById('totalPedidos').textContent = '0';
+                    document.getElementById('pedidosPendentes').textContent = '0';
+                    document.getElementById('pedidosConfirmados').textContent = '0';
+                    document.getElementById('totalVendas').textContent = 'R$ 0,00';
+                }
+            } catch (error) {
+                console.error('📊 [STATS] Erro ao carregar estatísticas:', error);
+                console.error('📊 [STATS] Tipo do erro:', error.name);
+                console.error('📊 [STATS] Mensagem:', error.message);
+                console.error('📊 [STATS] Stack:', error.stack);
+                
+                document.getElementById('totalPedidos').textContent = '0';
+                document.getElementById('pedidosPendentes').textContent = '0';
+                document.getElementById('pedidosConfirmados').textContent = '0';
+                document.getElementById('totalVendas').textContent = 'R$ 0,00';
+            }
+        }
+
+        // Carregar pedidos
+        async function loadPedidos() {
+            try {
+                console.log('🛒 [PEDIDOS] Iniciando carregamento de pedidos...');
+                console.log('🛒 [PEDIDOS] Usuário ID:', currentUser.id);
+                
+                // Primeiro buscar as lojas do logista
+                console.log('🛒 [PEDIDOS] Buscando lojas do logista...');
+                const lojasResponse = await fetch(`${BASE_URL}/dashboard/minhas-lojas`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                console.log('🛒 [PEDIDOS] Status da resposta de lojas:', lojasResponse.status);
+                console.log('🛒 [PEDIDOS] URL da resposta de lojas:', lojasResponse.url);
+                
+                if (!lojasResponse.ok) {
+                    const errorText = await lojasResponse.text();
+                    console.error('🛒 [PEDIDOS] Erro ao buscar lojas:', errorText);
+                    throw new Error('Erro ao buscar lojas do logista');
+                }
+                
+                const lojasData = await lojasResponse.json();
+                console.log('🛒 [PEDIDOS] Dados de lojas recebidos:', lojasData);
+                
+                const lojas = lojasData.lojas || [];
+                console.log('🛒 [PEDIDOS] Lojas do logista:', lojas);
+                
+                if (!lojas || lojas.length === 0) {
+                    console.log('🛒 [PEDIDOS] Nenhuma loja encontrada');
+                    document.getElementById('pedidosList').innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma loja encontrada. 
+                            Cadastre uma loja primeiro para receber pedidos.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Buscar pedidos de todas as lojas do logista
+                const lojaIds = lojas.map(loja => loja.id).join(',');
+                console.log('🛒 [PEDIDOS] Buscando pedidos das lojas:', lojaIds);
+                console.log('🛒 [PEDIDOS] URL dos pedidos:', `${BASE_URL}/api/pedidos?lojaId=${lojaIds}`);
+                
+                const response = await fetch(`${BASE_URL}/api/pedidos?lojaId=${lojaIds}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                console.log('🛒 [PEDIDOS] Status da resposta de pedidos:', response.status);
+                console.log('🛒 [PEDIDOS] Headers da resposta de pedidos:', response.headers);
+                
+                if (response.ok) {
+                    const pedidos = await response.json();
+                    console.log('🛒 [PEDIDOS] Dados de pedidos recebidos:', pedidos);
+                    displayPedidos(pedidos);
+                    console.log('🛒 [PEDIDOS] Pedidos exibidos na interface');
+                    } else {
+                    const errorText = await response.text();
+                    console.error('🛒 [PEDIDOS] Erro na API de pedidos:', response.status, response.statusText);
+                    console.error('🛒 [PEDIDOS] Resposta de erro:', errorText);
+                    
+                document.getElementById('pedidosList').innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhum pedido encontrado.
+                    </div>
+                `;
+                }
+            } catch (error) {
+                console.error('🛒 [PEDIDOS] Erro ao carregar pedidos:', error);
+                console.error('🛒 [PEDIDOS] Tipo do erro:', error.name);
+                console.error('🛒 [PEDIDOS] Mensagem:', error.message);
+                console.error('🛒 [PEDIDOS] Stack:', error.stack);
+                
+                document.getElementById('pedidosList').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Erro ao carregar pedidos: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Carregar lojas
+        async function loadLojas() {
+            try {
+                console.log('🏪 [LOJAS] Iniciando carregamento de lojas...');
+                console.log('🏪 [LOJAS] Usuário ID:', currentUser.id);
+                console.log('🏪 [LOJAS] URL:', `${BASE_URL}/dashboard/minhas-lojas`);
+                
+                const response = await fetch(`${BASE_URL}/dashboard/minhas-lojas`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                console.log('🏪 [LOJAS] Status da resposta:', response.status);
+                console.log('🏪 [LOJAS] Headers da resposta:', response.headers);
+                console.log('🏪 [LOJAS] URL da resposta:', response.url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🏪 [LOJAS] Dados recebidos:', data);
+                    
+                    const lojas = data.lojas || [];
+                        userLojas = lojas;
+                    console.log('🏪 [LOJAS] Lojas processadas:', lojas);
+                    displayLojas(lojas);
+                    console.log('🏪 [LOJAS] Lojas exibidas na interface');
+                    } else {
+                    const errorText = await response.text();
+                    console.error('🏪 [LOJAS] Erro na API:', response.status, response.statusText);
+                    console.error('🏪 [LOJAS] Resposta de erro:', errorText);
+                    
+                document.getElementById('lojasList').innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma loja encontrada.
+                    </div>
+                `;
+                }
+            } catch (error) {
+                console.error('🏪 [LOJAS] Erro ao carregar lojas:', error);
+                console.error('🏪 [LOJAS] Tipo do erro:', error.name);
+                console.error('🏪 [LOJAS] Mensagem:', error.message);
+                console.error('🏪 [LOJAS] Stack:', error.stack);
+                
+                document.getElementById('lojasList').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Erro ao carregar lojas: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Carregar produtos
+        async function loadProdutos() {
+            try {
+                console.log('Carregando produtos para usuário ID:', currentUser.id);
+                
+                // Verificar se há lojas cadastradas
+                if (userLojas.length === 0) {
+                    document.getElementById('produtosList').innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhuma loja encontrada. 
+                            Cadastre uma loja primeiro para gerenciar produtos.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Buscar produtos de todas as lojas do logista
+                const lojaIds = userLojas.map(loja => loja.id).join(',');
+                console.log('Buscando produtos das lojas:', lojaIds);
+                
+                const response = await fetch(`${BASE_URL}/api/produtos?lojaId=${lojaIds}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    
+                    console.log('Resposta da API de produtos:', response.status);
+                    
+                    if (response.ok) {
+                        const produtos = await response.json();
+                        console.log('Dados de produtos da API:', produtos);
+                    displayProdutos(produtos);
+                } else {
+                    console.log('❌ Erro na API de produtos:', response.status, response.statusText);
+                    document.getElementById('produtosList').innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Nenhum produto encontrado.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                document.getElementById('produtosList').innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-circle"></i> Erro ao carregar produtos: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Carregar perfil
+        async function loadPerfil() {
+            if (currentUser) {
+                document.getElementById('perfilContent').innerHTML = `
+                    <div class="form-group">
+                        <label>Nome:</label>
+                        <input type="text" value="${currentUser.nome || ''}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" value="${currentUser.email || ''}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone:</label>
+                        <input type="text" value="${currentUser.telefone || ''}" readonly>
+                    </div>
+                `;
+            }
+        }
+
+        // Exibir pedidos
+        function displayPedidos(pedidos) {
+            if (pedidos.length === 0) {
+                document.getElementById('pedidosList').innerHTML = '<p>Nenhum pedido encontrado.</p>';
+                return;
+            }
+
+            let html = '<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">';
+            html += '<thead><tr><th>ID</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+            
+            pedidos.forEach(pedido => {
+                                html += `
+                                    <tr>
+                        <td>#${pedido.id}</td>
+                        <td>${pedido.cliente_nome || 'N/A'}</td>
+                        <td>R$ ${(pedido.valor_total || 0).toFixed(2).replace('.', ',')}</td>
+                        <td><span class="status-${pedido.status}">${pedido.status}</span></td>
+                        <td>
+                            <button onclick="updatePedidoStatus(${pedido.id}, 'confirmado')">Confirmar</button>
+                            <button onclick="updatePedidoStatus(${pedido.id}, 'cancelado')">Cancelar</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            
+                            html += '</tbody></table>';
+            document.getElementById('pedidosList').innerHTML = html;
+        }
+
+        // Exibir lojas
+        function displayLojas(lojas) {
+            if (lojas.length === 0) {
+                document.getElementById('lojasList').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Nenhuma loja encontrada. 
+                        <button class="btn btn-info" onclick="showAddLojaModal()" style="margin-left: 10px;">
+                            <i class="fas fa-plus"></i> Adicionar Primeira Loja
+                        </button>
+                    </div>
+                `;
+                            return;
+            }
+
+            let html = '<table class="table"><thead><tr><th>Nome</th><th>Status</th><th>Tipo de Venda</th><th>Endereço</th><th>Ações</th></tr></thead><tbody>';
+            
+            lojas.forEach(loja => {
+                const statusClass = loja.status_aprovacao || 'pendente';
+                const tipoVendaClass = loja.tipo_venda || 'ambos';
+                
+                html += `
+                    <tr>
+                        <td><strong>${loja.nome}</strong></td>
+                        <td><span class="status-badge status-${statusClass}">${statusClass}</span></td>
+                        <td><span class="status-badge status-${tipoVendaClass}">${tipoVendaClass}</span></td>
+                        <td>${loja.endereco || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="editLoja(${loja.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="viewProdutos(${loja.id})">
+                                <i class="fas fa-box"></i> Produtos
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteLoja(${loja.id})">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('lojasList').innerHTML = html;
+        }
+
+        // Exibir produtos
+        function displayProdutos(produtos) {
+            if (produtos.length === 0) {
+                document.getElementById('produtosList').innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Nenhum produto encontrado. 
+                        <button class="btn btn-info" onclick="showAddProdutoModal()" style="margin-left: 10px;">
+                            <i class="fas fa-plus"></i> Adicionar Primeiro Produto
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<table class="table"><thead><tr><th>Nome</th><th>Categoria</th><th>Preço Varejo</th><th>Preço Atacado</th><th>Loja</th><th>Ações</th></tr></thead><tbody>';
+            
+            produtos.forEach(produto => {
+                html += `
+                    <tr>
+                        <td><strong>${produto.nome_produto}</strong></td>
+                        <td>${produto.categoria || 'N/A'}</td>
+                        <td>R$ ${(produto.preco_varejo || 0).toFixed(2).replace('.', ',')}</td>
+                        <td>R$ ${(produto.preco_atacado || 0).toFixed(2).replace('.', ',')}</td>
+                        <td>${produto.loja_nome || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="editProduto(${produto.id})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduto(${produto.id})">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('produtosList').innerHTML = html;
+        }
+
+        // Navegação entre abas
+        function showTab(tabName) {
+            // Esconder todas as abas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar aba selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Atualizar status do pedido
+        async function updatePedidoStatus(pedidoId, status) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/pedidos/${pedidoId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: status })
+                });
+                
+                if (response.ok) {
+                    showSuccess(`Pedido #${pedidoId} atualizado para ${status}`);
+                    loadPedidos(); // Recarregar lista
+                } else {
+                    showError('Erro ao atualizar pedido');
+                }
+            } catch (error) {
+                showError('Erro de conexão');
+            }
+        }
+
+        // ===== FUNÇÕES DOS MODAIS =====
+        
+        // Mostrar modal adicionar loja
+        function showAddLojaModal() {
+            document.getElementById('addLojaModal').style.display = 'block';
+            document.getElementById('addLojaForm').reset();
+        }
+
+        // Mostrar modal adicionar produto
+        function showAddProdutoModal() {
+            loadLojasForProduto();
+            document.getElementById('addProdutoModal').style.display = 'block';
+            document.getElementById('addProdutoForm').reset();
+        }
+
+        // Mostrar modal editar loja
+        function editLoja(lojaId) {
+            const loja = userLojas.find(l => l.id === lojaId);
+            if (!loja) {
+                showError('Loja não encontrada');
+                return;
+            }
+
+            // Preencher formulário de edição
+            document.getElementById('editLojaId').value = loja.id;
+            document.getElementById('editLojaNome').value = loja.nome || '';
+            document.getElementById('editLojaDescricao').value = loja.descricao || '';
+            document.getElementById('editLojaTelefone').value = loja.telefone || '';
+            document.getElementById('editLojaEmail').value = loja.email || '';
+            document.getElementById('editLojaEndereco').value = loja.endereco || '';
+            document.getElementById('editLojaBairro').value = loja.bairro || '';
+            document.getElementById('editLojaCidade').value = loja.cidade || '';
+            document.getElementById('editLojaEstado').value = loja.estado || '';
+            document.getElementById('editLojaCep').value = loja.cep || '';
+            document.getElementById('editLojaRegiao').value = loja.regiao || '';
+            document.getElementById('editLojaPolo').value = loja.polo || '';
+            document.getElementById('editLojaInstagram').value = loja.instagram || '';
+            document.getElementById('editLojaWhatsapp').value = loja.whatsapp || '';
+            document.getElementById('editLojaTipoVenda').value = loja.tipo_venda || '';
+            document.getElementById('editLojaSegmento').value = loja.segmento_id || '';
+            document.getElementById('editLojaQuantidadeMinimaAtacado').value = loja.quantidade_minima_atacado || 1;
+
+            document.getElementById('editLojaModal').style.display = 'block';
+        }
+
+        // Editar produto
+        function editProduto(produtoId) {
+            showSuccess(`Editando produto #${produtoId} - Funcionalidade em desenvolvimento`);
+        }
+
+        // Visualizar produtos da loja
+        function viewProdutos(lojaId) {
+            showTab('produtos');
+            showSuccess(`Visualizando produtos da loja #${lojaId}`);
+        }
+
+        // Fechar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Carregar lojas para o select de produtos
+        function loadLojasForProduto() {
+            const select = document.getElementById('produtoLoja');
+            select.innerHTML = '<option value="">Selecione uma loja</option>';
+            
+            userLojas.forEach(loja => {
+                const option = document.createElement('option');
+                option.value = loja.id;
+                option.textContent = loja.nome;
+                option.setAttribute('data-tipo-venda', loja.tipo_venda || 'ambos');
+                option.setAttribute('data-quantidade-minima', loja.quantidade_minima_atacado || 1);
+                select.appendChild(option);
+            });
+        }
+
+        // Atualizar tipo de venda do produto baseado na loja selecionada
+        function updateTipoVendaProduto() {
+            const selectLoja = document.getElementById('produtoLoja');
+            const selectTipoVenda = document.getElementById('produtoTipoVenda');
+            const quantidadeMinima = document.getElementById('produtoQuantidadeMinima');
+            const selectedOption = selectLoja.options[selectLoja.selectedIndex];
+            
+            if (selectedOption.value) {
+                const tipoVenda = selectedOption.getAttribute('data-tipo-venda');
+                const quantidadeMinimaLoja = selectedOption.getAttribute('data-quantidade-minima') || 1;
+                
+                selectTipoVenda.disabled = false;
+                selectTipoVenda.innerHTML = '';
+                
+                // Atualizar quantidade mínima
+                quantidadeMinima.value = quantidadeMinimaLoja;
+                
+                if (tipoVenda === 'varejo') {
+                    selectTipoVenda.innerHTML = '<option value="varejo">Apenas Varejo</option>';
+                } else if (tipoVenda === 'atacado') {
+                    selectTipoVenda.innerHTML = '<option value="atacado">Apenas Atacado</option>';
+                } else {
+                    selectTipoVenda.innerHTML = `
+                        <option value="varejo">Varejo</option>
+                        <option value="atacado">Atacado</option>
+                        <option value="ambos">Ambos</option>
+                    `;
+                }
+            } else {
+                selectTipoVenda.disabled = true;
+                selectTipoVenda.innerHTML = '<option value="">Selecione uma loja primeiro</option>';
+                quantidadeMinima.value = 1;
+            }
+        }
+
+        // Upload de imagem
+        function handleImageUpload(fileInputId, hiddenInputId) {
+            const fileInput = document.getElementById(fileInputId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            const previewDiv = document.getElementById(hiddenInputId + 'Preview');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            // Validar arquivo
+            if (!validateImageFile(file)) return;
+            
+            // Simular upload (em produção, enviaria para o servidor)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageUrl = e.target.result;
+                hiddenInput.value = imageUrl;
+                
+                if (previewDiv) {
+                    previewDiv.innerHTML = `
+                        <img src="${imageUrl}" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 10px;">
+                        <p style="margin-top: 5px; color: #666; font-size: 12px;">Imagem selecionada</p>
+                    `;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Validar arquivo de imagem
+        function validateImageFile(file) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            
+            if (file.size > maxSize) {
+                showError('Arquivo muito grande. Máximo 5MB.');
+                return false;
+            }
+            
+            if (!allowedTypes.includes(file.type)) {
+                showError('Formato não permitido. Use JPG, PNG ou WebP.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // ===== FUNÇÕES DOS FORMULÁRIOS =====
+        
+        // Adicionar loja
+        async function addLoja(formData) {
+            try {
+                const response = await fetch(`${BASE_URL}/dashboard/cadastrar-loja`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Loja cadastrada com sucesso!');
+                    closeModal('addLojaModal');
+                    loadLojas();
+                } else {
+                    showError(result.error || 'Erro ao cadastrar loja');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Atualizar loja
+        async function updateLoja(lojaId, formData) {
+            try {
+                const response = await fetch(`${BASE_URL}/dashboard/atualizar-loja`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ id: lojaId, ...formData })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Loja atualizada com sucesso!');
+                    closeModal('editLojaModal');
+                    loadLojas();
+                } else {
+                    showError(result.error || 'Erro ao atualizar loja');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Adicionar produto
+        async function addProduto(formData) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/produtos`, {
+                    method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Produto adicionado com sucesso!');
+                    closeModal('addProdutoModal');
+                    loadProdutos();
+                } else {
+                    showError(result.error || 'Erro ao adicionar produto');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Excluir loja
+        async function deleteLoja(lojaId) {
+            if (!confirm('Tem certeza que deseja excluir esta loja? Esta ação não pode ser desfeita.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BASE_URL}/dashboard/excluir-loja`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ id: lojaId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('Loja excluída com sucesso!');
+                    loadLojas();
+                } else {
+                    showError(result.error || 'Erro ao excluir loja');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Excluir produto
+        async function deleteProduto(produtoId) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BASE_URL}/api/produtos/${produtoId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showSuccess('Produto excluído com sucesso!');
+                    loadProdutos();
+                } else {
+                    showError('Erro ao excluir produto');
+                }
+            } catch (error) {
+                showError('Erro de conexão: ' + error.message);
+            }
+        }
+
+        // Funções de teste removidas - dashboard pronto para produção
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            authToken = null;
+            userLojas = [];
+            
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            showLogin();
+            document.getElementById('loginForm').reset();
+        }
+
+        // Utilitários
+        function showError(message) {
+            // Criar alerta personalizado
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-error';
+            alertDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            // Criar alerta personalizado
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.style.minWidth = '300px';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Drag and drop para upload de imagens
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            
+            uploadAreas.forEach(area => {
+                area.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                
+                area.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                
+                area.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const fileInput = this.querySelector('input[type="file"]');
+                        fileInput.files = files;
+                        fileInput.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
