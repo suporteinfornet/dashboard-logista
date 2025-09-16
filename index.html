@@ -1116,6 +1116,25 @@
         // Configurações da API (igual ao admin panel)
         const BASE_URL = 'https://lequedemodas.com.br:8443/leque-de-modas-api';
         
+        // Configurações para URLs de imagens (Apache)
+        const IMAGE_BASE_URL = 'http://177.153.62.253/lojas';
+        
+        // Função para construir URL de imagem
+        function buildImageUrl(loja, tipo = 'galeria', nomeArquivo = '') {
+            if (!loja || !nomeArquivo) return '';
+            
+            const empreendimento = loja.empreendimento_nome || 'default';
+            const segmento = loja.segmento_nome || 'default';
+            const nomeLoja = loja.nome || 'default';
+            
+            if (tipo === 'galeria') {
+                return `${IMAGE_BASE_URL}/${empreendimento}/${segmento}/${nomeLoja}/galeria/${nomeArquivo}`;
+            } else {
+                // Para avatar e logo
+                return `${IMAGE_BASE_URL}/${empreendimento}/${segmento}/${nomeLoja}/${nomeArquivo}`;
+            }
+        }
+        
         // Variáveis globais
         let currentUser = null;
         let authToken = null;
@@ -1919,20 +1938,47 @@
             // Validar arquivo
             if (!validateImageFile(file)) return;
             
-            // Simular upload (em produção, enviaria para o servidor)
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imageUrl = e.target.result;
-                hiddenInput.value = imageUrl;
-                
-                if (previewDiv) {
-                    previewDiv.innerHTML = `
-                        <img src="${imageUrl}" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 10px;">
-                        <p style="margin-top: 5px; color: #666; font-size: 12px;">Imagem selecionada</p>
-                    `;
-                }
-            };
-            reader.readAsDataURL(file);
+            // Gerar nome único para o arquivo
+            const timestamp = Date.now();
+            const fileExtension = file.name.split('.').pop();
+            const fileName = `produto_${timestamp}.${fileExtension}`;
+            
+            // Construir URL da imagem usando a loja selecionada
+            const lojaSelect = document.getElementById('produtoLoja');
+            const lojaId = lojaSelect ? lojaSelect.value : null;
+            const loja = userLojas.find(l => l.id == lojaId);
+            
+            let imageUrl = '';
+            if (loja) {
+                imageUrl = buildImageUrl(loja, 'galeria', fileName);
+            } else {
+                // Fallback para preview local
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageUrl = e.target.result;
+                    hiddenInput.value = imageUrl;
+                    
+                    if (previewDiv) {
+                        previewDiv.innerHTML = `
+                            <img src="${imageUrl}" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 10px;">
+                            <p style="margin-top: 5px; color: #666; font-size: 12px;">Imagem selecionada (preview local)</p>
+                        `;
+                    }
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+            
+            // Salvar URL da imagem
+            hiddenInput.value = imageUrl;
+            
+            if (previewDiv) {
+                previewDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 10px;">
+                    <p style="margin-top: 5px; color: #666; font-size: 12px;">Imagem: ${fileName}</p>
+                    <p style="margin-top: 2px; color: #999; font-size: 10px;">URL: ${imageUrl}</p>
+                `;
+            }
         }
 
         // Validar arquivo de imagem
