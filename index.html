@@ -1497,7 +1497,7 @@
                 console.log('🛒 [PEDIDOS] Buscando pedidos das lojas:', lojaIds);
                 console.log('🛒 [PEDIDOS] URL dos pedidos:', `${BASE_URL}/api/pedidos?lojaId=${lojaIds}`);
                 
-                const response = await fetch(`${BASE_URL}/api/pedidos?lojaId=${lojaIds}`, {
+                const response = await fetch(`${BASE_URL}/api/pedidos/?lojaId=${lojaIds}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1611,7 +1611,7 @@
                 const lojaIds = userLojas.map(loja => loja.id).join(',');
                 console.log('Buscando produtos das lojas:', lojaIds);
                 
-                const response = await fetch(`${BASE_URL}/api/produtos?lojaId=${lojaIds}`, {
+                const response = await fetch(`${BASE_URL}/produtos?lojaId=${lojaIds}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2056,7 +2056,7 @@
         // Adicionar produto
         async function addProduto(formData) {
             try {
-                const response = await fetch(`${BASE_URL}/api/produtos`, {
+                const response = await fetch(`${BASE_URL}/produtos`, {
                     method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -2115,7 +2115,7 @@
             }
             
             try {
-                const response = await fetch(`${BASE_URL}/api/produtos/${produtoId}`, {
+                const response = await fetch(`${BASE_URL}/produtos/${produtoId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${authToken}`
