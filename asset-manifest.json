@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/dashboard-logista/static/js/main.f7645b10.js",
+    "index.html": "/dashboard-logista/index.html",
+    "main.f7645b10.js.map": "/dashboard-logista/static/js/main.f7645b10.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.f7645b10.js"
+  ]
+}
