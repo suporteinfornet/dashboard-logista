@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste API - Dashboard Logista</title>
+</head>
+<body>
+    <h1>Teste da API</h1>
+    <button onclick="testLogin()">Testar Login</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testando...';
+            
+            try {
+                const response = await fetch('https://lequedemodas.com.br:8443/leque-de-modas-api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'applequedemodas@gmail.com',
+                        senha: '123456' // Substitua pela senha correta
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <h3>Status: ${response.status}</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <h3>Erro:</h3>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
